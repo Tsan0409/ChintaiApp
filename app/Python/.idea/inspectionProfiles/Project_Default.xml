@@ -1,0 +1,72 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="7">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="li" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="LossyEncoding" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E402" />
+          <option value="E501" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N806" />
+          <option value="N803" />
+          <option value="N812" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyShadowingBuiltinsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredNames">
+        <list>
+          <option value="id" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="int.*" />
+          <option value="loan_app.models.Option.objects" />
+          <option value="loan_app.models.InterestRate.objects" />
+          <option value="loan_app.models.Bank.objects" />
+          <option value="loan_app.views.OnlyYouMixin.request" />
+          <option value="loan_app.views.OnlyYouMixin.kwargs" />
+          <option value="loan_app.views.UserMethods.request" />
+          <option value="loan_app.forms.CalculationForm._errors" />
+          <option value="loan_app.forms.CalculationForm.error_class" />
+          <option value="loan_app.forms.CalculationForm.bank_option" />
+          <option value="loan_app.forms.CalculationForm.bank_rate" />
+          <option value="loan_app.forms.CalculationForm.cleaned_data" />
+          <option value="loan_app.forms.CalculationForm.fields" />
+          <option value="loan_app.forms.MyMethods._errors" />
+          <option value="loan_app.forms.MyMethods.error_class" />
+          <option value="loan_app.forms.MyMethods.bank_option" />
+          <option value="loan_app.forms.MyMethods.bank_rate" />
+          <option value="loan_app.forms.MyMethods.cleaned_data" />
+          <option value="loan_app.forms.MyMethods.fields" />
+          <option value="loan_app.models.InterestRate._meta" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

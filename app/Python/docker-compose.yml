@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    command: python3 ./deep_learning/manage.py runserver 0.0.0.0:8888
+    volumes:
+      - .:/code
+    ports:
+      - "8888:8888"
+    networks:
+        - sail
+networks:
+    sail:
+        driver: bridge
