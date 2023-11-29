@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ctv_csvfiles', function (Blueprint $table) {
+        Schema::create('city_csv_files', function (Blueprint $table) {
             $table->id();
             $table->string('file_name', 100);
-            $table->foreignId('prefecture_id')->constrained();
             $table->foreignId('city_id')->constrained();
             $table->integer('K');
             $table->integer('LDK');
@@ -31,6 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ctv_csvfiles');
+        Schema::dropIfExists('city_csv_files');
     }
 };
+
