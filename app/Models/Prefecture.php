@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Prefecture extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     public function cities(): HasMany
     {

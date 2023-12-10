@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('SDK');
             $table->integer('SK');
             $table->integer('SLDK');
+            $table->integer('DK');
             $table->timestamps();
         });
     }

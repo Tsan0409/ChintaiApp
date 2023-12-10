@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class City extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     public function prefecture(): BelongsTo
     {
