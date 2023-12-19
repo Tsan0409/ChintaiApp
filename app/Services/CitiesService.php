@@ -2,11 +2,20 @@
 namespace App\Services;
 
 use App\Repositories\CitiesRepository;
-use App\Models\City;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class CitiesService
 {
-    public static function insertCity(string $name, string $kana_name, string $prefecture_id): City
+    // 全ての市町村データを取得する
+    public static function selectAllCities(): Collection
+    {
+        $all_cities = CitiesRepository::selectAllCities();
+        return $all_cities;
+    }
+
+    // 市町村データを保存する
+    public static function insertCity(string $name, string $kana_name, string $prefecture_id): Model
     {
         $params = [
             'name' => $name,

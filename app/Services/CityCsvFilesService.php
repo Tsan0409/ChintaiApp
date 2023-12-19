@@ -1,13 +1,21 @@
 <?php
 namespace App\Services;
 
-use App\Models\City;
-use App\Models\CityCsvFile;
 use App\Repositories\CityCsvFilesRepository;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class CityCsvFilesService
 {   
-    public static function insertCityCsvFile(string $csv_file, City $city, array $room_plan): CityCsvFile
+    // 全てのcsvファイルを取得する
+    public static function selectAllCityCsvFiles(): Collection
+    {
+        $all_csv_files = CityCsvFilesRepository::selectAllCityCsvFiles();
+        return $all_csv_files;
+    }
+
+    // 保存する
+    public static function insertCityCsvFile(string $csv_file, Model $city, array $room_plan): Model
     {
 
         $all_room_plan = ['K', 'LDK', 'R', 'SDK', 'SK', 'SLDK', 'DK'];

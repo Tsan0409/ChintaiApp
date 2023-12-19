@@ -3,41 +3,62 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CityCsvFile;
-use Illuminate\Http\Request;
+use App\services\PrefecturesService;
 use App\Services\CitiesService;
 use App\Services\CityCsvFilesService;
 
-// Csvファイル作成クラス
+use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
+
+// 機械学習用データ取得クラス
 class GetCsvController extends Controller
 {
 
-    var $prefecture_id = '27';
-    var $city_name = '高槻';
-    var $city_kana_name = 'たかつき';
-    var $csv_file_name = '20231205Osaka_Takatsuki.csv';
-    var $scraping_url = 'https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=060&bs=040&ta=27&sc=27207&cb=0.0&ct=9999999&et=9999999&cn=9999999&mb=0&mt=9999999&shkr1=03&shkr2=03&shkr3=03&shkr4=03&fw2=';
-    var $room_plan = ['DK', 'LDK', 'K', 'R'];
+    public $prefecture_id;
+    public $city_name;
+    public $city_kana_name;
+    public $csv_file_name;
+    public $scraping_url;
+    public $room_plan;
 
-    
-    public function getCsv(){
+    // フォームを作成
+    public function getInfo()
+    {
+        $all_prefectures = PrefecturesService::selectAllPrefectures();
+        $all_cities = CitiesService::selectAllCities();
+        $all_csv_files = CityCsvFilesService::selectAllCityCsvFiles();
 
-        // apiでデータを取得する
+        return view('admin/get_info', [
+                'prefectures' => $all_prefectures, 
+                'cities' => $all_cities,
+                'all_csv_files' => $all_csv_files
+            ]);
+    }
+
+    // 送られたデータを処理
+    public function getCsv(Request $request): View
+    {
+        // postデータを取得
+        $this->prefecture_id = $request->prefecture_id;
+        $this->city_name = $request->city_name;
+        $this->city_kana_name = $request->city_kana_name;
+        $this->csv_file_name = $request->csv_file_name;
+        $this->scraping_url = $request->scraping_url;
+
+        // apiに送るデータを変数に入れる
         $api_url = 'http://host.docker.internal:8888/api/v1/chintai_app/get_deepl_data/';
         $params = [
             'url' => $this->scraping_url,
             'csv_name' => $this->csv_file_name
         ];  
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $api_url);
-        curl_setopt($ch, CURLOPT_POST, TRUE);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $res = curl_exec($ch);
-        curl_close($ch);
+        // api呼び出し  
+        $response_array = $this->postUrl($api_url, $params);
+
+        // 文字列を配列に変換
+        $plan_list = str_replace("'", '"', $response_array['plan_list']);
+        $this->room_plan = json_decode($plan_list, true);
 
         // 市町村データを保存
         $city = $this->insertCity();
@@ -45,23 +66,42 @@ class GetCsvController extends Controller
         // 取得データを保存
         $city_csv_file = $this->insertCityCsvFiles($city);
 
-        $AllRes = [$res, $city, $city_csv_file];
-        return $AllRes;
+        return view('admin/get_info_complete', [
+            'city' => $city,
+            'city_csv_file' => $city_csv_file
+        ]);
+    }
+
+        // apiでデータを取得するして連想配列で返す
+    public function postUrl($api_url, $params): array
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $api_url);
+        curl_setopt($ch, CURLOPT_POST, TRUE);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        // jsonを連想配列に変更
+        $response_array = json_decode($response, true);
+        return $response_array;
     }
 
     // 市町村データの保存
-    public function insertCity()
+    public function insertCity(): Model
     {
         $city = CitiesService::insertCity($this->city_name, $this->city_kana_name, $this->prefecture_id);
         return $city;
     }
     
     // 取得データの保存
-    public function insertCityCsvFiles($city)
+    public function insertCityCsvFiles($city): Model
     {
         $csv_file = CityCsvFilesService::insertCityCsvFile($this->csv_file_name, $city, $this->room_plan);
         return $csv_file;
     }
 
-    
 }

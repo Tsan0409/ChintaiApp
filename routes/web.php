@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\CsvController;
+use App\Http\Controllers\Admin\GetCsvController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,3 +23,10 @@ Route::get('/user', function(){
 });
 
 Route::get('/userClass', [App\Http\Controllers\User::class, 'index']);
+Route::get('admin/cities', [CsvController::class, 'index']);
+Route::get('admin/cities/{id}', [CsvController::class, 'show']);
+Route::get('admin/exec_deepl',  [CsvController::class, 'execDeepLearning'])->name('deepLearning.exec');
+Route::prefix('admin/get_csv')->group(function() {
+    Route::get('', [GetCsvController::class, 'getInfo'])->name('info.get');
+    Route::post('exec', [GetCsvController::class, 'getCsv'])->name('csv.get');
+});
