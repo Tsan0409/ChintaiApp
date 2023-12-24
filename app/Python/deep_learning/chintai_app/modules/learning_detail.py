@@ -48,7 +48,7 @@ class LearningOutlier(DeepLearning):
 
         # 外れ値用のシリーズに変換
         distance = pd.Series(distance)
-        distance.plot(kind='box')
+        # distance.plot(kind='box')
         # plt.show()
 
         print('判定後の外れ値を表示する\n')

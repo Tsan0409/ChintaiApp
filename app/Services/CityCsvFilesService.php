@@ -37,4 +37,11 @@ class CityCsvFilesService
         return $city_csv_file;
 
     }
+
+    // 市町村番号から最新のファイル名を取得する
+    public static function getNewCsvFileName(int $city_id): Model
+    {
+        $csv_file = CityCsvFilesRepository::getNewCsvFileName($city_id);
+        return $csv_file;
+    }
 }

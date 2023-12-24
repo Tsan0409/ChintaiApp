@@ -19,7 +19,15 @@ class CityCsvFilesRepository
     // 機械学習用データを登録
     public static function insertCityCsvFile(array $params): Model
     {
-        $cityCsvFile = CityCsvFile::create($params);
-        return $cityCsvFile;
+        $city_csv_file= CityCsvFile::create($params);
+        return $city_csv_file;
     }
+
+    // 市町村番号から最新のcsvファイル名を取得する
+    public static function getNewCsvFileName(int $city_id): Model
+    {   
+        $csv_file = CityCsvFile::orderBy('created_at')->where('city_id', '=', $city_id)->first();
+        return $csv_file;
+    }
+
 }
