@@ -21,10 +21,9 @@ class ExecDeepLearning(APIView):
 
     def post(self, request, format=None):
 
-        # http://0.0.0.0:8888/api/v1/chintai_app?data=2&data=52&data=40&data=55&data=0&data=1&data=0&data=0&data=0&data=0
-
+        # http://0.0.0.0:8888/api/v1/chintai_app?data=2&data=52&data=40&data=55&data=0&data=1&data=0&data=0&data=0&data=
         # 配列内容['部屋数', '面積', '距離', '築年数', 'K', 'LDK', 'R', 'SDK', 'SK', 'SLDK']
-        file_name = request.POST.get('file_name')
+        file_name = f"scraping_data/{request.POST.get('file_name')}"
         data = request.POST.getlist('data')
         plan = request.POST.get('plan')
 
@@ -47,13 +46,13 @@ class GetDeepLearningData(APIView):
         
         # ポストデータを取得する
         url = request.POST.get('url')
-        csv_name = request.POST.get('csv_name')
+        csv_name = f"scraping_data/{request.POST.get('csv_name')}"
         
         # データを取得する
         town_data = get_csv.GetDtail(url, csv_name)
         town_data.get_html()
         total_page = town_data.get_page()
-        #total_page = 1
+        # total_page = 1
         plan_list = town_data.get_town_data(total_page)
         
         # Laravelに返す値を取得する

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Prefecture;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 
 class PrefecturesRepository
 {
@@ -12,6 +13,13 @@ class PrefecturesRepository
     {
         $all_prefectures = Prefecture::all();
         return $all_prefectures;
+    }
+
+    // 都道府県idからデータを取得する
+    public static function selectPrefecture(int $prefecture_id): Model
+    {
+        $prefecture = Prefecture::find($prefecture_id);
+        return $prefecture;
     }
 
 }

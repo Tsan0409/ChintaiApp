@@ -1,7 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\GetCsvController;
+
+use App\Http\Controllers\Admin\GetInfoFetchCsvController;
+use App\Http\Controllers\Admin\ExecFetchCsvController;
+use App\Http\Controllers\GetInfoDeepLearningController;
 use App\Http\Controllers\EexcDeepLearningController;
 
 /*
@@ -15,16 +18,18 @@ use App\Http\Controllers\EexcDeepLearningController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function () {return view('index');})->name('home');
 Route::get('/user', function(){
     return view('user.index');
 });
 
 Route::get('/userClass', [App\Http\Controllers\User::class, 'index']);
-Route::get('admin/exec_deepl',  [EexcDeepLearningController::class, 'execDeepLearning'])->name('deepLearning.exec');
-Route::prefix('admin/get_csv')->group(function() {
-    Route::get('', [GetCsvController::class, 'getInfo'])->name('info.get');
-    Route::post('exec', [GetCsvController::class, 'getCsv'])->name('csv.get');
+
+Route::prefix('get_deeplearning')->group(function() {
+    Route::get('',  [GetInfoDeepLearningController::class, 'getInfoDeepLearning'])->name('deepLearningInfo.get');
+    Route::get('exec',  [EexcDeepLearningController::class, 'execDeepLearning'])->name('deepLearning.exec');
+});
+Route::prefix('admin/fetch_csv')->group(function() {
+    Route::get('', [GetInfoFetchCsvController::class, 'getInfo'])->name('info.get');
+    Route::post('exec', [ExecFetchCsvController::class, 'fetchCsv'])->name('csv.get');
 });
