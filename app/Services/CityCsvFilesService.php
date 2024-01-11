@@ -38,10 +38,28 @@ class CityCsvFilesService
 
     }
 
-    // 市町村番号から最新のファイル名を取得する
-    public static function getNewCsvFileName(int $city_id): Model
+    // 市町村番号から最新のデータを取得する
+    public static function selectNewCsvFileName(int $city_id): Model
     {
-        $csv_file = CityCsvFilesRepository::getNewCsvFileName($city_id);
+        $csv_file = CityCsvFilesRepository::selectNewCsvFileName($city_id);
         return $csv_file;
     }
+
+    // 市町村番号から最新の間取りを取得
+    public static function selectRoomPlans(int $city_id): array
+    {
+        $city_csv_files = CityCsvFilesRepository::selectNewCsvFileName($city_id);
+        $room_plans = [
+            'K' => $city_csv_files->K,
+            'LDK' => $city_csv_files->LDK,
+            'R' => $city_csv_files->R,
+            'SDK' => $city_csv_files->SDK,
+            'SK' => $city_csv_files->SK,
+            'SLDK' => $city_csv_files->SLDK,
+            'DK' => $city_csv_files->DK
+        ];
+
+        return $room_plans;
+    }
+
 }

@@ -23,8 +23,8 @@ class CityCsvFilesRepository
         return $city_csv_file;
     }
 
-    // 市町村番号から最新のcsvファイル名を取得する
-    public static function getNewCsvFileName(int $city_id): Model
+    // 市町村番号から最新のデータを取得する
+    public static function selectNewCsvFileName(int $city_id): Model
     {   
         $csv_file = CityCsvFile::orderBy('created_at')->where('city_id', '=', $city_id)->first();
         return $csv_file;

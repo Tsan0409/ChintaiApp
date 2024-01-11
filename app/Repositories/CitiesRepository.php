@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class CitiesRepository
 {
+    // 指定した都道府県の市町村データを取得する
+    public static function selectCitiesByPrefecture(int $prefecture_id): Collection
+    {
+        $cities = City::where('prefecture_id', '=', "{$prefecture_id}")->get();
+        return $cities;
+    }
+
     // 市町村データを全て取得する
     public static function selectAllCities(): Collection
     {
