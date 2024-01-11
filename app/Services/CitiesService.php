@@ -21,6 +21,13 @@ class CitiesService
         return $all_cities;
     }
 
+    // 市町村idからデータを取得する
+    public static function selectCityByCityId(int $city_id): Model
+    {
+        $city = CitiesRepository::selectCityByCityId($city_id);
+        return $city;
+    }
+
     // 市町村データを保存する
     public static function insertCity(string $name, string $kana_name, string $prefecture_id): Model
     {

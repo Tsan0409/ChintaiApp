@@ -24,19 +24,19 @@
         </div>
         <div class="room_count">   
             <h4>部屋数</h4>
-            <input type="text" class="room_count" value="{{ old('room_count') }}">部屋
+            <input type="text" name="room_count" value="{{ old('room_count') }}">部屋
         </div>
         <div class="room_area">   
             <h4>広さ(㎡)</h4>
-            <input type="text" class="room_area" value="{{ old('room_area') }}">㎡
+            <input type="text" name="room_area" value="{{ old('room_area') }}">㎡
         </div>
         <div class="distance">   
             <h4>駅までの徒歩距離(分)</h4>
-            <input type="text" class="room_area" value="{{ old('distance') }}">分
+            <input type="text" name="distance" value="{{ old('distance') }}">分
         </div>
         <div class="building_age">   
             <h4>築年数(年)</h4>
-            <input type="text" class="room_area" value="{{ old('room_area') }}">年
+            <input type="text" name="building_age" value="{{ old('room_area') }}">年
         </div>
         <div class="room_plans">   
             <h4>間取り</h4>

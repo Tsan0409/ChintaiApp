@@ -104,11 +104,10 @@ class RegressionAnalysis(DeepLearning):
                 plans_array.append('0')
                 
         merged_data = [self.target_data + plans_array]
-        sample = pd.DataFrame(data=merged_data, columns=new_column_names)
+        
+        # 予測用のデータフレームを作成する
+        predict_data = pd.DataFrame(data=merged_data, columns=new_column_names)
 
-        sa = sc_model_x.transform(sample)
-        for i in sa:
-            print(i)
-        print(sa)
-        print(sc_model_y.inverse_transform(model.predict(sa)))
-        return sc_model_y.inverse_transform(model.predict(sa))
+        # 結果を予測する
+        result = sc_model_x.transform(predict_data) 
+        return sc_model_y.inverse_transform(model.predict(result))

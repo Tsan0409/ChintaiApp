@@ -27,7 +27,7 @@ Route::get('/userClass', [App\Http\Controllers\User::class, 'index']);
 
 Route::prefix('get_deeplearning')->group(function() {
     Route::get('',  [GetInfoDeepLearningController::class, 'getInfoDeepLearning'])->name('deepLearningInfo.get');
-    Route::get('exec',  [EexcDeepLearningController::class, 'execDeepLearning'])->name('deepLearning.exec');
+    Route::post('exec',  [EexcDeepLearningController::class, 'execDeepLearning'])->name('deepLearning.exec');
 });
 
 Route::get('/dashboard', function () {

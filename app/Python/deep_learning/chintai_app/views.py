@@ -30,11 +30,7 @@ class ExecDeepLearning(APIView):
         learning = regression.RegressionAnalysis(file_name, self.columns, self.str_columns, data, plan)
         result_data = learning.learning()
 
-        result = {
-            'result': result_data,
-            'request_params': self.target_data
-        }
-        return Response(result)
+        return Response(result_data[0][0])
 
 # 機械学習用のデータを取得
 class GetDeepLearningData(APIView):
