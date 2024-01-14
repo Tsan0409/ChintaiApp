@@ -39,9 +39,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::prefix('admin/fetch_csv')->group(function() {
-        Route::get('', [GetInfoFetchCsvController::class, 'getInfo'])->name('info.get');
-        Route::post('exec', [ExecFetchCsvController::class, 'fetchCsv'])->name('csv.get');
+    Route::prefix('/admin/fetch_csv')->group(function() {
+        Route::get('register', [GetInfoFetchCsvController::class, 'getInfoForRegister'])->name('info.get.register');
+        Route::post('register_exec', [ExecFetchCsvController::class, 'fetchCsvByRegister'])->name('csv.get.register');
+        Route::get('update', [GetInfoFetchCsvController::class, 'getInfoForUpdate'])->name('info.get.update');
+        Route::post('update_exec', [ExecFetchCsvController::class, 'fetchCsvByUpdate'])->name('csv.get.update');
     });
 
 });

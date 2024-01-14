@@ -16,6 +16,7 @@ class ExecFetchCsvController extends Controller
 
     private $api_url;
     private $prefecture;
+    private $city;
     private $city_name;
     private $city_kana_name;
     private $scraping_url;
@@ -24,15 +25,23 @@ class ExecFetchCsvController extends Controller
     public function __construct(Request $request) {
         $this->api_url = 'http://host.docker.internal:8888/api/v1/chintai_app/get_deepl_data/';
         $this->prefecture = PrefecturesService::selectPrefecture($request->prefecture_id);
-        $this->city_name = $request->city_name;
-        $this->city_kana_name = $request->city_kana_name;
         $this->scraping_url = $request->scraping_url;
+
+        // 新規追加と更新で処理を分ける
+        if ($request->has('city_name') && $request->has('city_kana_name')) {
+            // 新規追加の場合
+            $this->city_name = $request->city_name;
+            $this->city_kana_name = $request->city_kana_name;
+        } else {
+            // 更新の場合
+            $this->city = CitiesService::selectCityByCityId($request->city_id);
+        }
+        
     }
 
     // 送られたデータを処理
-    public function fetchCsv(): View
+    public function fetchCsvByRegister(): View
     {
-
         // カナ名をローマ字に変換する
         $prefecture_roma_name = $this->kanaToRoma($this->prefecture->kana_name);
         $city_roma_name = $this->kanaToRoma($this->city_kana_name);
@@ -62,6 +71,39 @@ class ExecFetchCsvController extends Controller
 
         return view('admin/get_info_complete', [
             'city' => $city,
+            'city_csv_file' => $city_csv_file
+        ]);
+    }
+
+    // 送られたデータを処理
+    public function fetchCsvByUpdate(): View
+    {
+        // カナ名をローマ字に変換する
+        $prefecture_roma_name = $this->kanaToRoma($this->prefecture->kana_name);
+        $city_roma_name = $this->kanaToRoma($this->city->kana_name);
+
+        // csvファイルを命名する
+        $today = date('Ymd') ;
+        $csv_file_name = "{$today}_{$prefecture_roma_name}_{$city_roma_name}.csv";
+
+        // apiに送るデータを連想配列に入れる
+        $params = [
+            'url' => $this->scraping_url,
+            'csv_name' => $csv_file_name
+        ];
+                
+        // api呼び出し  
+        $response_array = $this->postUrl($params);
+
+        // 文字列を配列に変換
+        $plan_list = str_replace("'", '"', $response_array['plan_list']);
+        $this->room_plan = json_decode($plan_list, true);
+
+        // 取得データを追加
+        $city_csv_file = $this->insertCityCsvFiles($this->city, $csv_file_name);
+
+        return view('admin/get_info_complete', [
+            'city' => $this->city,
             'city_csv_file' => $city_csv_file
         ]);
     }

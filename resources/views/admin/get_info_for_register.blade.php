@@ -1,6 +1,6 @@
 <x-layouts.chintai-app>
-    <h1>機械学習用データを取得する</h1>
-    <form action="{{ route('csv.get') }}" method="POST">
+    <h1>機械学習用データを登録する</h1>
+    <form action="{{ route('csv.get.register') }}" method="POST">
         @csrf
         <div class="prefectures">   
             <h3>都道府県</h3>

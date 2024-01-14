@@ -9,6 +9,6 @@
         {{ $city_csv_file->file_name }}
     </div>
     <div>
-        <a href="{{ route('info.get') }}">戻る</a>
+        <a href="{{ route('info.get.register') }}">戻る</a>
     </div>
 </x-layouts.chintai-app>
