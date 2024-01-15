@@ -1,5 +1,14 @@
 <x-layouts.chintai-app>
     <h1>機械学習用データを更新する</h1>
+    @if ($errors->any())
+    <div style="color:red">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{  $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
     <form action="{{ route('csv.get.update') }}" method="POST">
         @csrf
         <div class="prefectures">   
