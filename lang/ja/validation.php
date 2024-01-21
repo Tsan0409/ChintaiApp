@@ -19,6 +19,10 @@ return [
         'city_id' => '市町村',
         'scraping_url' => 'スクレイピング用のURL',
         'city_name' => '市町村名（漢字）',
-        'city_kana_name' => '市町村名（かな）'
+        'city_kana_name' => '市町村名（かな）',
+        'room_area' => '部屋面積',
+        'building_age' => '築年数',
+        'room_count' => '部屋数',
+        'distance' => '駅までの距離',
     ],
 ];

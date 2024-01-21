@@ -2,7 +2,7 @@
 
     <p>都道府県：{{ $prefecture_name }}</p>
     <p>市町村　：{{ $city_name }}</p>
-    <p>部屋面積：{{ $room_area }}/p>
+    <p>部屋面積：{{ $room_area }}</p>㎡
     <p>築年数　：{{ $building_age }}年</p>
     <p>部屋数　：{{ $room_count }}部屋</p>
     <p>駅徒歩　：{{ $distance }}分</p>

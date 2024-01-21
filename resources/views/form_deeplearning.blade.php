@@ -1,5 +1,14 @@
 <x-layouts.chintai-app>
     <h1>都道府県と市町村を選択する</h1>
+    @if ($errors->any())
+    <div style="color:red">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{  $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
     <form action="{{ route('deepLearning.exec') }}" method="POST">
         @csrf
         <div class="prefectures">   
@@ -36,7 +45,7 @@
         </div>
         <div class="building_age">   
             <h4>築年数(年)</h4>
-            <input type="text" name="building_age" value="{{ old('room_area') }}">年
+            <input type="text" name="building_age" value="{{ old('building_age') }}">年
         </div>
         <div class="room_plans">   
             <h4>間取り</h4>
