@@ -3,23 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ExecDeepLearningPostRequest;
 use App\Services\PrefecturesService;
 use App\Services\CitiesService;
 use App\Services\CityCsvFilesService;
-
-use App\Http\Requests\ExecDeepLearningPostRequest;
+use App\Traits\GetJsonData;
+use App\Traits\KanaToRoma;
 use Illuminate\Database\Eloquent\Model;
 
 // 機械学習実行用のコントローラー
 class EexcDeepLearningController extends Controller
 {
 
-    private $url;
+    use GetJsonData;
+    use KanaToRoma;
 
-    public function __construct() {
+    private $api_url;
+    private $prefectures_service;
+    private $cities_service;
+    private $city_csv_files_service;
 
-        $this->url = 'http://host.docker.internal:8888/api/v1/chintai_app/';
-
+    public function __construct(PrefecturesService $prefectures_service ,CitiesService $cities_service,CityCsvFilesService $city_csv_files_service) {
+        $this->api_url = 'http://host.docker.internal:8888/api/v1/chintai_app/';
+        $this->prefectures_service = $prefectures_service;
+        $this->cities_service = $cities_service;
+        $this->city_csv_files_service = $city_csv_files_service;
     }
 
     public function execDeepLearning(ExecDeepLearningPostRequest $request)
@@ -50,22 +58,15 @@ class EexcDeepLearningController extends Controller
             'plan' => $room_plan
         ];
 
-        // => トレイトにまとめる
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url);
-        curl_setopt($ch, CURLOPT_POST, TRUE);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = floatval(curl_exec($ch));
-        curl_close($ch);
+        // apiを叩く
+        $response_json = $this->get_json_data($params, $this->api_url);
+        $response_float = floatval($response_json);
 
         // 都道府県名を取得する
-        $prefecture_name = PrefecturesService::selectPrefecture($prefecture_id)->name;
-        $city_name = CitiesService::selectCityByCityId($city_id)->name;
+        $prefecture_name = $this->prefectures_service->selectPrefecture($prefecture_id)->name;
+        $city_name = $this->cities_service->selectCityByCityId($city_id)->name;
 
-        $rounded_price = round($response, 1);
+        $rounded_price = round($response_float, 1);
 
         return view('complete_deeplearning', [
             'prefecture_name' => $prefecture_name,
@@ -81,7 +82,7 @@ class EexcDeepLearningController extends Controller
 
     public function getNewCsvFileName(int $city_id): Model
     {
-        $csv_file = CityCsvFilesService::selectNewCsvFileName($city_id);
+        $csv_file = $this->city_csv_files_service->selectNewCsvFileName($city_id);
         return $csv_file;
     }
 

@@ -17,26 +17,30 @@ use App\Services\CityCsvFilesService;
 // 機械学習実行用のフォーム作成
 class GetInfoDeepLearningController extends Controller
 {
-    private $all_prefectures;
-    private $cities;
-    private $city_csv_files;
-    private $room_plans;
 
-    public function __construct() {
-        $this->all_prefectures = PrefecturesService::selectAllPrefectures();
-        $this->cities = CitiesService::selectCitiesByPrefecture($this->all_prefectures->first()->id);
-        $this->city_csv_files = CityCsvFilesService::selectNewCsvFileName($this->cities->first()->id);
-        $this->room_plans = CityCsvFilesService::selectRoomPlans($this->cities->first()->id);
+    private $prefectures_service;
+    private $cities_service;
+    private $city_csv_files_service;
+
+    public function __construct(PrefecturesService $prefectures_service ,CitiesService $cities_service,CityCsvFilesService $city_csv_files_service) {
+        $this->prefectures_service = $prefectures_service;
+        $this->cities_service = $cities_service;
+        $this->city_csv_files_service = $city_csv_files_service;
     }
 
     public function getInfoDeepLearning(): View
     {
+        $all_prefectures = $this->prefectures_service->selectAllPrefectures();
+        $cities = $this->cities_service->selectCitiesByPrefecture($all_prefectures->first()->id);
+        $first_city = $cities->first()->id;
+        $city_csv_files = $this->city_csv_files_service->selectNewCsvFileName($first_city);
+        $room_plans = $this->city_csv_files_service->selectRoomPlans($first_city);
         
         return view('form_deeplearning', [
-            'prefectures' => $this->all_prefectures, 
-            'cities' => $this->cities,
-            'csv_files' => $this->city_csv_files,
-            'room_plans' => $this->room_plans
+            'prefectures' => $all_prefectures, 
+            'cities' => $cities,
+            'csv_files' => $city_csv_files,
+            'room_plans' => $room_plans
         ]);
 
     }

@@ -3,31 +3,39 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FetchCsvByRegisterPostRequest;
+use App\Http\Requests\FetchCsvByUpdatePostRequest;
 use App\Services\CitiesService;
 use App\Services\CityCsvFilesService;
 use App\Services\PrefecturesService;
-use App\Http\Requests\FetchCsvByRegisterPostRequest;
-use App\Http\Requests\FetchCsvByUpdatePostRequest;
+use App\Traits\GetJsonData;
+use App\Traits\KanaToRoma;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
 
 // 機械学習用データ取得クラス
 class ExecFetchCsvController extends Controller
 {
+    use KanaToRoma;
+    use GetJsonData;
 
     private $api_url;
+    private $prefectures_service;
+    private $cities_service;
+    private $city_csv_files_service;
 
-    public function __construct() {
-
+    public function __construct(PrefecturesService $prefectures_service ,CitiesService $cities_service,CityCsvFilesService $city_csv_files_service) {
         $this->api_url = 'http://host.docker.internal:8888/api/v1/chintai_app/get_deepl_data/';
-        
+        $this->prefectures_service = $prefectures_service;
+        $this->cities_service = $cities_service;
+        $this->city_csv_files_service = $city_csv_files_service;
     }
 
     // 送られたデータを登録
     public function fetchCsvByRegister(FetchCsvByRegisterPostRequest $request): View
     {
 
-        $prefecture = PrefecturesService::selectPrefecture($request->prefecture_id);
+        $prefecture = $this->prefectures_service->selectPrefecture($request->prefecture_id);
         $scraping_url = $request->scraping_url;
         $city_name = $request->city_name;
         $city_kana_name = $request->city_kana_name;
@@ -45,9 +53,12 @@ class ExecFetchCsvController extends Controller
             'url' => $scraping_url,
             'csv_name' => $csv_file_name
         ];
-                
+
         // api呼び出し  
-        $response_array = $this->postUrl($params);
+        $response_json = $this->get_json_data($params, $this->api_url);
+        // jsonを連想配列に変更
+
+        $response_array = json_decode($response_json, true);
 
         // 文字列を配列に変換
         $plan_list = str_replace("'", '"', $response_array['plan_list']);
@@ -69,9 +80,9 @@ class ExecFetchCsvController extends Controller
     public function fetchCsvByUpdate(FetchCsvByUpdatePostRequest $request): View
     {
 
-        $prefecture = PrefecturesService::selectPrefecture($request->prefecture_id);
+        $prefecture = $this->prefectures_service->selectPrefecture($request->prefecture_id);
         $scraping_url = $request->scraping_url;
-        $city = CitiesService::selectCityByCityId($request->city_id);
+        $city = $this->cities_service->selectCityByCityId($request->city_id);
 
         // カナ名をローマ字に変換する
         $prefecture_roma_name = $this->kanaToRoma($prefecture->kana_name);
@@ -88,7 +99,8 @@ class ExecFetchCsvController extends Controller
         ];
 
         // api呼び出し  
-        $response_array = $this->postUrl($params);
+        $response_json = $this->get_json_data($params, $this->api_url);
+        $response_array = json_decode($response_json, true);
 
         // 文字列を配列に変換
         $plan_list = str_replace("'", '"', $response_array['plan_list']);
@@ -103,86 +115,20 @@ class ExecFetchCsvController extends Controller
         ]);
     }
 
-    // apiでデータを取得するして連想配列で返す
-    public function postUrl(array $params): array
-    {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->api_url);
-        curl_setopt($ch, CURLOPT_POST, TRUE);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);  
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        // jsonを連想配列に変更
-        $response_array = json_decode($response, true);
-        return $response_array;
-    }
-
     // 市町村データの保存
     public function insertCity(string $city_name, string $city_kana_name, Model $prefecture): Model
     {
-        $city = CitiesService::insertCity($city_name, $city_kana_name, $prefecture->id);
+        $city = $this->cities_service->insertCity($city_name, $city_kana_name, $prefecture->id);
         return $city;
     }
     
     // 取得データの保存
     public function insertCityCsvFiles(Model $city, string $csv_file_name, array $room_plan): Model
     {
-        $csv_file = CityCsvFilesService::insertCityCsvFile($csv_file_name, $city, $room_plan);
+        $csv_file = $this->city_csv_files_service->insertCityCsvFile($csv_file_name, $city, $room_plan);
         return $csv_file;
     }
 
-    // ひらがなをローマ字に変換する
-    public function kanaToRoma(string $hiragana): string
-    {   
-        $hiraganaToRomaDict = [
-            'あ' => 'a', 'い' => 'i', 'う' => 'u', 'え' => 'e', 'お' => 'o',
-            'か' => 'ka', 'き' => 'ki', 'く' => 'ku', 'け' => 'ke', 'こ' => 'ko',
-            'さ' => 'sa', 'し' => 'shi', 'す' => 'su', 'せ' => 'se', 'そ' => 'so',
-            'た' => 'ta', 'ち' => 'chi', 'つ' => 'tsu', 'て' => 'te', 'と' => 'to',
-            'な' => 'na', 'に' => 'ni', 'ぬ' => 'nu', 'ね' => 'ne', 'の' => 'no',
-            'は' => 'ha', 'ひ' => 'hi', 'ふ' => 'fu', 'へ' => 'he', 'ほ' => 'ho',
-            'ま' => 'ma', 'み' => 'mi', 'む' => 'mu', 'め' => 'me', 'も' => 'mo',
-            'や' => 'ya', 'ゆ' => 'yu', 'よ' => 'yo',
-            'ら' => 'ra', 'り' => 'ri', 'る' => 'ru', 'れ' => 're', 'ろ' => 'ro',
-            'わ' => 'wa', 'を' => 'wo',
-            'ん' => 'n',
-            'きゃ' => 'kya', 'きゅ' => 'kyu', 'きょ' => 'kyo',
-            'しゃ' => 'sha', 'しゅ' => 'shu', 'しょ' => 'sho',
-            'ちゃ' => 'cha', 'ちゅ' => 'chu', 'ちょ' => 'cho',
-            'にゃ' => 'nya', 'にゅ' => 'nyu', 'にょ' => 'nyo',
-            'ひゃ' => 'hya', 'ひゅ' => 'hyu', 'ひょ' => 'hyo',
-            'みゃ' => 'mya', 'みゅ' => 'myu', 'みょ' => 'myo',
-            'りゃ' => 'rya', 'りゅ' => 'ryu', 'りょ' => 'ryo',
-            'が' => 'ga', 'ぎ' => 'gi', 'ぐ' => 'gu', 'げ' => 'ge', 'ご' => 'go',
-            'ざ' => 'za', 'じ' => 'ji', 'ず' => 'zu', 'ぜ' => 'ze', 'ぞ' => 'zo',
-            'だ' => 'da', 'ぢ' => 'ji', 'づ' => 'zu', 'で' => 'de', 'ど' => 'do',
-            'ば' => 'ba', 'び' => 'bi', 'ぶ' => 'bu', 'べ' => 'be', 'ぼ' => 'bo',
-            'ぱ' => 'pa', 'ぴ' => 'pi', 'ぷ' => 'pu', 'ぺ' => 'pe', 'ぽ' => 'po',
-            'っ' => '',
-        ];
-    
-        $roma = '';
-        $i = 0;
-        $len = mb_strlen($hiragana);
-    
-        while ($i < $len) {
-            // 2文字のパターンを先に確認
-            $doubleChar = mb_substr($hiragana, $i, 2);
-            if (isset($hiraganaToRomaDict[$doubleChar])) {
-                $roma .= $hiraganaToRomaDict[$doubleChar];
-                $i += 2;
-            } else {
-                // 1文字のパターン
-                $char = mb_substr($hiragana, $i, 1);
-                $roma .= isset($hiraganaToRomaDict[$char]) ? $hiraganaToRomaDict[$char] : $char;
-                $i++;
-            }
-        }
-        return $roma;
-    }
+
 
 }
