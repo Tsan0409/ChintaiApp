@@ -10,6 +10,7 @@ use App\Services\CityCsvFilesService;
 use App\Traits\GetJsonData;
 use App\Traits\KanaToRoma;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
 
 // 機械学習実行用のコントローラー
 class EexcDeepLearningController extends Controller
@@ -40,9 +41,6 @@ class EexcDeepLearningController extends Controller
         $building_age = $request->building_age;
         $room_plan = $request->room_plan;
 
-        // 送信用データの配列を作成
-        $data = [$room_count, $room_area, $distance, $building_age];
-
         // 市町村と紐づく一番新しいcsvファイルを取得
         $csv_file = $this->getNewCsvFileName($city_id);
 
@@ -50,16 +48,21 @@ class EexcDeepLearningController extends Controller
         $params = [
             'file_name' => $csv_file->file_name,
             'data' => array(
-                "$data[0]"=>"{$room_count}",
-                "$data[1]"=>"{$room_area}",
-                "$data[2]"=>"{$distance}",
-                "$data[3]"=>"{$building_age}",
+                "0"=>"{$room_count}",
+                "1"=>"{$room_area}",
+                "2"=>"{$distance}",
+                "3"=>"{$building_age}",
             ),
             'plan' => $room_plan
         ];
 
         // apiを叩く
         $response_json = $this->get_json_data($params, $this->api_url);
+        if (is_null($response_json)) {
+            $errorMessage = '結果を取得できませんでした。適切なパラメータを入力して下さい。';
+            Session::flash('error', $errorMessage);
+            return redirect()->back();
+        }
         $response_float = floatval($response_json);
 
         // 都道府県名を取得する

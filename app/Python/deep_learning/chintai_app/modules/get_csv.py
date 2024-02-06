@@ -96,6 +96,9 @@ class GetDtail(GetData):
 
             # 物件ごとに取得
             chintai_names = self.soup.find_all(class_="cassetteitem")
+            if not chintai_names:
+                return False
+
             for n in chintai_names:
 
                 items = []

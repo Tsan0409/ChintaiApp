@@ -22,4 +22,11 @@ class PrefecturesService
         return $prefecture;
     }
 
+    // 関連する市町村テーブルが存在する都道府県のみ取得
+    public static function selectPrefectureHasCities(): Collection
+    {
+        $prefectures = PrefecturesRepository::selectPrefectureHasCities();
+        return $prefectures;
+    }
+
 }

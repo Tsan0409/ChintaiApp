@@ -30,14 +30,14 @@ class GetInfoDeepLearningController extends Controller
 
     public function getInfoDeepLearning(): View
     {
-        $all_prefectures = $this->prefectures_service->selectAllPrefectures();
-        $cities = $this->cities_service->selectCitiesByPrefecture($all_prefectures->first()->id);
+        $prefectures_has_cities = $this->prefectures_service->selectPrefectureHasCities();
+        $cities = $this->cities_service->selectCitiesByPrefecture($prefectures_has_cities->first()->id);
         $first_city = $cities->first()->id;
         $city_csv_files = $this->city_csv_files_service->selectNewCsvFileName($first_city);
         $room_plans = $this->city_csv_files_service->selectRoomPlans($first_city);
         
         return view('form_deeplearning', [
-            'prefectures' => $all_prefectures, 
+            'prefectures' => $prefectures_has_cities,
             'cities' => $cities,
             'csv_files' => $city_csv_files,
             'room_plans' => $room_plans

@@ -12,6 +12,8 @@ use App\Traits\GetJsonData;
 use App\Traits\KanaToRoma;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 // 機械学習用データ取得クラス
 class ExecFetchCsvController extends Controller
@@ -32,7 +34,7 @@ class ExecFetchCsvController extends Controller
     }
 
     // 送られたデータを登録
-    public function fetchCsvByRegister(FetchCsvByRegisterPostRequest $request): View
+    public function fetchCsvByRegister(FetchCsvByRegisterPostRequest $request)
     {
 
         $prefecture = $this->prefectures_service->selectPrefecture($request->prefecture_id);
@@ -57,18 +59,30 @@ class ExecFetchCsvController extends Controller
         // api呼び出し  
         $response_json = $this->get_json_data($params, $this->api_url);
         // jsonを連想配列に変更
-
         $response_array = json_decode($response_json, true);
+        if (is_null($response_array)) {
+            $errorMessage = 'データが取得できませんでした。適切なデータを取得してください。';
+            Session::flash('error', $errorMessage);
+            return redirect()->back();
+        }
 
         // 文字列を配列に変換
         $plan_list = str_replace("'", '"', $response_array['plan_list']);
         $room_plan = json_decode($plan_list, true);
 
-        // 市町村データを保存
-        $city = $this->insertCity($city_name, $city_kana_name, $prefecture);
+        DB::beginTransaction();
+        try {
+            // 市町村データを保存
+            $city = $this->insertCity($city_name, $city_kana_name, $prefecture);
+            // 取得データを保存
+            $city_csv_file = $this->insertCityCsvFiles($city, $csv_file_name, $room_plan);
 
-        // 取得データを保存
-        $city_csv_file = $this->insertCityCsvFiles($city, $csv_file_name, $room_plan);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Session::flash('error', $e->getMessage());
+            return redirect()->back();
+        }
 
         return view('admin/get_info_complete', [
             'city' => $city,
@@ -101,13 +115,26 @@ class ExecFetchCsvController extends Controller
         // api呼び出し  
         $response_json = $this->get_json_data($params, $this->api_url);
         $response_array = json_decode($response_json, true);
+        if (is_null($response_array)) {
+            $errorMessage = 'データが取得できませんでした。適切なデータを取得してください。';
+            Session::flash('error', $errorMessage);
+            return redirect()->back();
+        }
 
         // 文字列を配列に変換
         $plan_list = str_replace("'", '"', $response_array['plan_list']);
         $room_plan = json_decode($plan_list, true);
 
-        // 取得データを追加
-        $city_csv_file = $this->insertCityCsvFiles($city, $csv_file_name, $room_plan);
+        DB::beginTransaction();
+        try {
+            // 取得データを追加
+            $city_csv_file = $this->insertCityCsvFiles($city, $csv_file_name, $room_plan);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Session::flash('error', $e->getMessage());
+            return redirect()->back();
+        }
 
         return view('admin/get_info_complete', [
             'city' => $city,
@@ -128,7 +155,5 @@ class ExecFetchCsvController extends Controller
         $csv_file = $this->city_csv_files_service->insertCityCsvFile($csv_file_name, $city, $room_plan);
         return $csv_file;
     }
-
-
 
 }

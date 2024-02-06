@@ -1,4 +1,9 @@
 <x-layouts.chintai-app>
+    @if(Session::has('error'))
+    <div style="color:red" class="alert alert-danger">
+        {{ Session::get('error') }}
+    </div>
+    @endif
     <h1>都道府県と市町村を選択する</h1>
     @if ($errors->any())
     <div style="color:red">

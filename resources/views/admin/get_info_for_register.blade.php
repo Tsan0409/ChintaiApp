@@ -1,5 +1,10 @@
 <x-layouts.chintai-app>
     <h1>機械学習用データを登録する</h1>
+    @if(Session::has('error'))
+    <div style="color:red" class="alert alert-danger">
+        {{ Session::get('error') }}
+    </div>
+    @endif
     @if ($errors->any())
     <div style="color:red">
         <ul>
