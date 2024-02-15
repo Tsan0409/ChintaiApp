@@ -29,3 +29,11 @@ docker run --rm \
 ./vendor/bin/sail artisan migrate
 4. テストデータ挿入
 ./vendor/bin/sail artisan db:seed
+## その他
+### 学習データ用のURL
+下記のサイトから対象のエリアまで移動し、URLを取得してください。
+https://suumo.jp/chintai/kansai/
+### テストユーザー
+ユーザー名　　：MastaerUser
+メールアドレス：test@test.com
+パスワード　　：testTEST@1

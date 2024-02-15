@@ -40,7 +40,7 @@
         <div class="scraping_url">
             <h3>スクレイピング用のURL</h3>
             <div class="sample">
-                https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=060&bs=040&ta=27&sc=27207&cb=0.0&ct=9999999&et=9999999&cn=9999999&mb=0&mt=9999999&shkr1=03&shkr2=03&shkr3=03&shkr4=03&fw2=
+                利用データは<a href="https://suumo.jp/chintai/kansai/">こちら</a>からお探しください（関西版）
             </div>
             <input type="text" name="scraping_url" value="{{ old('scraping_url') }}">
         </div>

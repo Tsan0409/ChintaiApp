@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Repositories\CitiesRepository;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -18,7 +20,11 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
-        // 都道府県のデータを挿入
+
         $this->call(PrefecturesTableSeeder::class);
+        $this->call(CitiesTableSeeder::class);
+        $this->call(CityCsvFilesTableSeeder::class);
+        $this->call(UsersTableSeeder::class);
+
     }
 }
