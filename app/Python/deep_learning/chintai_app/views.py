@@ -32,7 +32,7 @@ class ExecDeepLearning(APIView):
 
         return Response(result_data[0][0])
 
-# 機械学習用のデータを取得
+# スクレイピングを実行して機械学習用のデータを取得（csvファイルを保存する）
 class GetDeepLearningData(APIView):
 
     def __init__(self, **kwargs):
@@ -45,18 +45,14 @@ class GetDeepLearningData(APIView):
         csv_name = f"scraping_data/{request.POST.get('csv_name')}"
         
         # データを取得する
-        town_data = get_csv.GetDtail(url, csv_name)
-        town_data.get_html()
-        total_page = town_data.get_page()
-        # total_page = 1
-        plan_list = town_data.get_town_data(total_page)
+        town_data = get_csv.CreateCityCsvFile(csv_name)
+        plan_list = town_data.get_town_data(url)
         
         # Laravelに返す値を取得する
         
         result = {
             'url': f'{url}',
             'csv_name': f'{csv_name}',
-            'total_page': f'{total_page}',
             'plan_list': f'{plan_list}'
         }
         return Response(result)
